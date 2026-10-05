@@ -97,6 +97,15 @@ within the configured number of minutes, the bridge appends the call to that
 ticket instead of creating a new one. Editable live in the admin UI. Lookups
 fail open — if Zammad cannot be queried, a normal ticket is created.
 
+### 3CX call ID on tickets
+
+Every call article carries a `3CX Call ID: <id>` line — the 3CX `ActiveCalls`
+Id. Set `call_id_field` to the name of a Zammad ticket attribute (create it
+first in Admin → Objects) to also store the ID of the call that created the
+ticket in that field. The ID matches the last 8 hex digits of
+`MainCallHistoryId` in the 3CX call log report (`ReportCallLogData`), e.g.
+27390 = `0x6afe` → `…00006afe`, so tickets can be joined to the call log.
+
 ## Running
  
 Run the release binary to run the daemon. 

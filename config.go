@@ -66,6 +66,11 @@ type Config struct {
 		// this many minutes, instead of opening a duplicate. 0 disables
 		// consolidation (always create) — the backward-compatible default.
 		AutoCreateDedupWindowMinutes int `yaml:"auto_create_dedup_window_minutes"`
+		// CallIDField names a Zammad ticket attribute (created beforehand in
+		// Admin → Objects) that receives the 3CX ActiveCalls Id of the call
+		// that created the ticket, so tickets can be joined to the 3CX call log.
+		// Empty disables it — the backward-compatible default.
+		CallIDField string `yaml:"call_id_field"`
 	} `yaml:"Zammad"`
 }
 

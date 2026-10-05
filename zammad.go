@@ -386,7 +386,26 @@ func buildCallBody(call *CallInformation, callType string) string {
 	}
 	parts = append(parts, fmt.Sprintf("Call Type: %s", callType))
 	parts = append(parts, fmt.Sprintf("Direction: %s", call.Direction))
+	if call.ID != "" {
+		parts = append(parts, fmt.Sprintf("3CX Call ID: %s", call.ID))
+	}
 	return strings.Join(parts, "\n")
+}
+
+// marshalTicket serializes the ticket and, when callIDField is set and the
+// call has an ID, adds that custom attribute. Zammad takes custom object
+// attributes as top-level ticket keys, whose names are only known from config.
+func marshalTicket(ticket ZammadTicketRequest, callIDField, callID string) ([]byte, error) {
+	body, err := json.Marshal(ticket)
+	if err != nil || callIDField == "" || callID == "" {
+		return body, err
+	}
+	var fields map[string]any
+	if err := json.Unmarshal(body, &fields); err != nil {
+		return nil, err
+	}
+	fields[callIDField] = callID
+	return json.Marshal(fields)
 }
 
 // ZammadCreateTicket creates a ticket in Zammad for the completed call
@@ -432,7 +451,7 @@ func (z *ZammadBridge) ZammadCreateTicket(call *CallInformation, cause string) e
 		}
 	}
 
-	requestBody, err := json.Marshal(ticket)
+	requestBody, err := marshalTicket(ticket, z.Config.Zammad.CallIDField, call.ID.String())
 	if err != nil {
 		return fmt.Errorf("unable to serialize ticket JSON: %w", err)
 	}

@@ -68,3 +68,8 @@ Zammad:
   # new/open ticket in ticket_group created within this many minutes, instead
   # of opening a duplicate. 0 disables consolidation (always create).
   auto_create_dedup_window_minutes: 0
+
+  # Name of a Zammad ticket attribute (create it first in Admin → Objects)
+  # that receives the 3CX call ID of the call that created the ticket.
+  # Leave empty to disable.
+  call_id_field: ""
