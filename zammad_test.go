@@ -37,6 +37,67 @@ func TestBuildCallBody(t *testing.T) {
 	}
 }
 
+func TestBuildCallBody_IncludesCallID(t *testing.T) {
+	call := &CallInformation{ID: "27390", CallFrom: "01223111842", Direction: "Inbound"}
+	if body := buildCallBody(call, "Inbound"); !strings.Contains(body, "3CX Call ID: 27390") {
+		t.Errorf("body missing 3CX call id; got:\n%s", body)
+	}
+	call.ID = ""
+	if body := buildCallBody(call, "Inbound"); strings.Contains(body, "3CX Call ID") {
+		t.Errorf("body has a 3CX call id line for a call without an ID; got:\n%s", body)
+	}
+}
+
+// createTicketPayload runs ZammadCreateTicket against a test server and
+// returns the decoded JSON the bridge POSTed to /api/v1/tickets.
+func createTicketPayload(t *testing.T, callIDField string, call *CallInformation) map[string]any {
+	t.Helper()
+	var payload map[string]any
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasPrefix(r.URL.Path, "/api/v1/users/search"):
+			_, _ = w.Write([]byte(`[{"id":42}]`))
+		case r.URL.Path == "/api/v1/tickets":
+			if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+				t.Errorf("ticket body is not JSON: %v", err)
+			}
+			w.WriteHeader(http.StatusCreated)
+			_, _ = w.Write([]byte(`{"id":2}`))
+		default:
+			w.WriteHeader(http.StatusOK)
+		}
+	}))
+	defer srv.Close()
+
+	z := newTestBridge(srv.URL)
+	z.Config.Zammad.CallIDField = callIDField
+	if err := z.ZammadCreateTicket(call, "normalClearing"); err != nil {
+		t.Fatalf("create err: %v", err)
+	}
+	return payload
+}
+
+func TestZammadCreateTicket_WritesCallIDField(t *testing.T) {
+	call := &CallInformation{ID: "27390", Direction: "Inbound", CallFrom: "01223111842", ExternalNumber: "01223111842"}
+	payload := createTicketPayload(t, "threecx_call_id", call)
+	if got := payload["threecx_call_id"]; got != "27390" {
+		t.Fatalf("threecx_call_id = %v, want \"27390\"; payload: %v", got, payload)
+	}
+	if payload["title"] == nil || payload["article"] == nil {
+		t.Fatalf("standard ticket fields lost when adding the call id: %v", payload)
+	}
+}
+
+func TestZammadCreateTicket_NoCallIDFieldWhenUnset(t *testing.T) {
+	call := &CallInformation{ID: "27390", Direction: "Inbound", CallFrom: "01223111842", ExternalNumber: "01223111842"}
+	payload := createTicketPayload(t, "", call)
+	for k := range payload {
+		if strings.Contains(k, "call_id") {
+			t.Fatalf("unexpected call id field %q when call_id_field is unset", k)
+		}
+	}
+}
+
 // newTestBridge points a bridge's Zammad API + CTI endpoint at a test server.
 func newTestBridge(apiURL string) *ZammadBridge {
 	cfg := &Config{}
