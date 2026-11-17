@@ -251,9 +251,9 @@ func TestCallTypeFor(t *testing.T) {
 }
 
 func TestBuildCallBody(t *testing.T) {
-	call := &CallInformation{CallFrom: "01223111842", AgentName: "Ramy Naeem", AgentNumber: "126", Direction: "Inbound"}
+	call := &CallInformation{CallFrom: "01000000000", AgentName: "Test Agent", AgentNumber: "126", Direction: "Inbound"}
 	body := buildCallBody(call, "Inbound")
-	for _, want := range []string{"Caller: 01223111842", "Agent: Ramy Naeem (126)", "Call Type: Inbound", "Direction: Inbound"} {
+	for _, want := range []string{"Caller: 01000000000", "Agent: Test Agent (126)", "Call Type: Inbound", "Direction: Inbound"} {
 		if !strings.Contains(body, want) {
 			t.Errorf("body missing %q; got:\n%s", want, body)
 		}
@@ -386,7 +386,7 @@ func TestFindRecentOpenPhoneTicket_Found(t *testing.T) {
 	defer srv.Close()
 
 	z := newTestBridge(srv.URL)
-	call := &CallInformation{ExternalNumber: "01223111842"}
+	call := &CallInformation{ExternalNumber: "01000000000"}
 	id, found, err := z.ZammadFindRecentOpenPhoneTicket(call, 10, time.Now())
 	if err != nil {
 		t.Fatalf("err: %v", err)
@@ -411,7 +411,7 @@ func TestFindRecentOpenPhoneTicket_TooOld(t *testing.T) {
 	defer srv.Close()
 
 	z := newTestBridge(srv.URL)
-	call := &CallInformation{ExternalNumber: "01223111842"}
+	call := &CallInformation{ExternalNumber: "01000000000"}
 	_, found, err := z.ZammadFindRecentOpenPhoneTicket(call, 10, time.Now())
 	if err != nil || found {
 		t.Fatalf("found=%v err=%v, want found=false err=nil", found, err)
@@ -451,7 +451,7 @@ func TestAppendCallArticle_PostsArticle(t *testing.T) {
 	defer srv.Close()
 
 	z := newTestBridge(srv.URL)
-	call := &CallInformation{CallFrom: "01223111842", Direction: "Inbound", AgentNumber: "126"}
+	call := &CallInformation{CallFrom: "01000000000", Direction: "Inbound", AgentNumber: "126"}
 	if err := z.ZammadAppendCallArticle(100, call, "normalClearing"); err != nil {
 		t.Fatalf("append err: %v", err)
 	}
@@ -667,7 +667,7 @@ func TestZammadHangup_AppendsOnRecentDuplicate(t *testing.T) {
 
 	z := newTestBridge(srv.URL)
 	z.SetAutoCreateSettings(AutoCreateSettings{Enabled: true, Directions: "all", DedupWindowMinutes: 10})
-	call := &CallInformation{ExternalNumber: "01223111842", CallFrom: "01223111842", Direction: "Inbound", AgentNumber: "126", ZammadInitialized: true}
+	call := &CallInformation{ExternalNumber: "01000000000", CallFrom: "01000000000", Direction: "Inbound", AgentNumber: "126", ZammadInitialized: true}
 
 	if err := z.ZammadHangup(call, "normalClearing"); err != nil {
 		t.Fatalf("hangup err: %v", err)
@@ -700,7 +700,7 @@ func TestZammadHangup_CreatesWhenNoDuplicate(t *testing.T) {
 
 	z := newTestBridge(srv.URL)
 	z.SetAutoCreateSettings(AutoCreateSettings{Enabled: true, Directions: "all", DedupWindowMinutes: 10})
-	call := &CallInformation{ExternalNumber: "01223111842", CallFrom: "01223111842", Direction: "Inbound", AgentNumber: "126", ZammadInitialized: true}
+	call := &CallInformation{ExternalNumber: "01000000000", CallFrom: "01000000000", Direction: "Inbound", AgentNumber: "126", ZammadInitialized: true}
 
 	if err := z.ZammadHangup(call, "normalClearing"); err != nil {
 		t.Fatalf("hangup err: %v", err)
