@@ -4,11 +4,14 @@ metadata:
   name: 3cx-zammad-bridge
   title: 3CX ↔ Zammad Bridge
   description: >-
-    Go daemon that monitors calls on a 3CX phone system and forwards call
-    events to Zammad's CTI webhook, creating/updating support tickets from
-    phone activity. Fork of qmexnetworks/3cx-zammad-bridge with AGM-specific
-    patches (e.g. auto-creating a Zammad user when one isn't found before
-    ticket creation).
+    Go daemon that polls the 3CX phone system for active calls and forwards
+    call events to Zammad's CTI webhook. AGM fork of
+    qmexnetworks/3cx-zammad-bridge (forked at upstream v0.8.0) with AGM
+    changes: polling through the 3CX XAPI ActiveCalls endpoint, creating a
+    Zammad phone ticket (and customer) when a call ends, direction and
+    extension filters that fail closed, a repeat-call de-duplication window,
+    the 3CX call ID on tickets, and a password-protected admin page
+    (/bridge-admin/) that changes these settings without a restart.
   tags:
     - go
     - cti
@@ -22,8 +25,11 @@ metadata:
     - url: https://github.com/qmexnetworks/3cx-zammad-bridge
       title: Upstream repository
       icon: github
-    - url: https://zammad.agmegypt.com
+    - url: https://helpdesk.agmegypt.com
       title: Zammad (destination instance)
+      icon: dashboard
+    - url: https://helpdesk.agmegypt.com/bridge-admin/
+      title: Bridge admin page
       icon: dashboard
   annotations:
     backstage.io/techdocs-ref: dir:.
