@@ -14,8 +14,8 @@ When a customer's call drops and is re-dialled, or is transferred internally,
 3CX reports more than one completed call, so the bridge creates more than one
 ticket for what the customer experienced as a single contact.
 
-**Observed case:** tickets `8892856` and `8892857` — same caller `01223111842`,
-same agent (Ramy Naeem, ext 126), inbound, created **2m41s apart**
+**Observed case:** tickets `<ticket A>` and `<ticket B>` — same caller `01000000000`,
+same agent (Test Agent, ext 126), inbound, created **2m41s apart**
 (2026-06-02 09:40:24 and 09:43:05 UTC). Reported by the LC team as a duplicate.
 
 ## Goal
