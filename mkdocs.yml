@@ -1,6 +1,27 @@
 site_name: 3CX ↔ Zammad Bridge (AGM)
+site_description: >-
+  Go daemon that turns 3CX phone calls into Zammad CTI events and phone tickets.
+repo_url: https://github.com/AGM-One-Vision/3cx-zammad-bridge
+edit_uri: edit/main/docs/
+docs_dir: docs
+
 nav:
   - Overview: index.md
-  - Configuration: configuration.md
+  - Run locally: run-locally.md
+  - Architecture: architecture.md
+  - Deploy & operate: deploy-operate.md
+  - Reference: reference.md
+
+# docs/superpowers/ holds working notes; they are not part of the site.
+exclude_docs: |
+  superpowers/
+
 plugins:
   - techdocs-core
+
+markdown_extensions:         # lets ```mermaid fences render in DevHub
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
